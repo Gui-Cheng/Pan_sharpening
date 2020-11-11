@@ -1,0 +1,52 @@
+#
+# @Author: wjm
+# @Date: 2019-10-13 21:45:10
+# @LastEditTime: 2019-10-13 21:46:06
+# @Description: file content
+# 
+
+name: Net
+algorithm: PNN #[PANNet, PNN]
+nEpochs: 1000
+gpu_mode: False
+save_best: False
+gpus: [0, 1]
+threads: 8
+
+seed: 123
+checkpoint: checkpoint
+data_dir_train: ./dataset
+data_dir_eval: ./dataset
+source_ms: ms
+source_pan: pan
+
+pretrain:
+  pretrained: False
+  pre_sr: 1592134968/best.pth
+  pre_folder: checkpoint
+
+data:
+  lrms_num: 4
+  upsacle:  4
+  batch_size: 16
+  patch_size: 64
+  data_augmentation: False                                                                                                                                                                                               
+  n_colors: 4
+  rgb_range: 255
+  normalize : False
+  
+schedule:
+  lr: 1e-1
+  decay: 200
+  gamma: 0.1
+  optimizer: SGD #[ADAM, SGD, RMSprop]
+  momentum: 0.9 #SGD momentum
+  beta1: 0.9 #ADAM beta
+  beta2: 0.999 #ADAM beta
+  epsilon: 1e-8 #ADAM epsilon
+  alpha: 0.9 #RMSprop alpha
+  weight_dency: 0
+  gclip: 0.4
+  loss: MSE #[MSE, L1]
+  use_YCbCr: False
+

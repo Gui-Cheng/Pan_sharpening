@@ -3,7 +3,7 @@
 '''
 @Author: wjm
 @Date: 2019-10-13 23:07:03
-LastEditTime: 2020-11-10 18:22:37
+LastEditTime: 2020-11-12 10:56:04
 @Description: file content
 '''
 import os, torch, time
@@ -27,7 +27,7 @@ class BaseSolver:
             self.num_workers = 0
 
         self.train_dataset = get_data(cfg, cfg['data_dir_train'])
-        self.train_loader = DataLoader(self.train_dataset, cfg['data']['batch_size'], shuffle=True,
+        self.train_loader = DataLoader(self.train_dataset, cfg['data']['batch_size'], shuffle=False,
             num_workers=self.num_workers)
         self.val_dataset = get_data(cfg, cfg['data_dir_eval'])
         self.val_loader = DataLoader(self.val_dataset, cfg['data']['batch_size'], shuffle=False,

@@ -3,7 +3,7 @@
 '''
 @Author: wjm
 @Date: 2019-10-13 23:04:48
-LastEditTime: 2020-11-11 17:07:55
+LastEditTime: 2020-11-12 15:18:01
 @Description: file content
 '''
 import os, importlib, torch, shutil
@@ -18,6 +18,7 @@ from torch.utils.data import DataLoader
 import torch.nn as nn
 from tensorboardX import SummaryWriter
 from utils.config import save_yml
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 class Solver(BaseSolver):
     def __init__(self, cfg):
@@ -52,16 +53,16 @@ class Solver(BaseSolver):
 
             epoch_loss = 0
             for iteration, batch in enumerate(self.train_loader, 1):
-                ms_image, lms_image, pan_image, bms_image = Variable(batch[0]), Variable(batch[1]), Variable(batch[2]), Variable(batch[3])
+                ms_image, lms_image, pan_image, bms_image, file = Variable(batch[0]), Variable(batch[1]), Variable(batch[2]), Variable(batch[3]), (batch[4])
             #for data in self.train_loader:
                 #lr, hr = data[0], data[1]
                 if self.cuda:
                     ms_image, lms_image, pan_image, bms_image = ms_image.cuda(self.gpu_ids[0]), lms_image.cuda(self.gpu_ids[0]), pan_image.cuda(self.gpu_ids[0]), bms_image.cuda(self.gpu_ids[0])
-                
+
                 self.optimizer.zero_grad()               
                 self.model.train()
 
-                y = self.model(bms_image, pan_image)
+                y = self.model(lms_image, bms_image, pan_image)
                 loss = self.loss(y, ms_image)
 
                 epoch_loss += loss.data
@@ -81,48 +82,50 @@ class Solver(BaseSolver):
             save_config(self.log_name, 'Initial Training Epoch {}: Loss={:.4f}'.format(self.epoch, self.records['Loss'][-1]))
             self.writer.add_scalar('Loss_epoch', self.records['Loss'][-1], self.epoch)
 
-    # def eval(self):
-    #     with tqdm(total=len(self.val_loader), miniters=1,
-    #             desc='Val Epoch: [{}/{}]'.format(self.epoch, self.nEpochs)) as t1:
-    #         psnr_list, ssim_list = [], []
-    #         for iteration, batch in enumerate(self.val_loader, 1):
-    #             lr, hr = Variable(batch[0]), Variable(batch[1])
-    #         #for lr, hr in self.val_loader:
-    #             if self.cuda:
-    #                 lr, hr = lr.cuda(), hr.cuda()
-    #             self.model.eval()
-    #             with torch.no_grad():
-    #                 sr = self.model(lr)
-    #                 loss = self.loss(sr, hr)
+    def eval(self):
+        with tqdm(total=len(self.val_loader), miniters=1,
+                desc='Val Epoch: [{}/{}]'.format(self.epoch, self.nEpochs)) as t1:
+            psnr_list, ssim_list = [], []
+            for iteration, batch in enumerate(self.val_loader, 1):
+                ms_image, lms_image, pan_image, bms_image, file = Variable(batch[0]), Variable(batch[1]), Variable(batch[2]), Variable(batch[3]), (batch[4])
+            #for data in self.train_loader:
+                #lr, hr = data[0], data[1]
+                if self.cuda:
+                    ms_image, lms_image, pan_image, bms_image = ms_image.cuda(self.gpu_ids[0]), lms_image.cuda(self.gpu_ids[0]), pan_image.cuda(self.gpu_ids[0]), bms_image.cuda(self.gpu_ids[0])
 
-    #             batch_psnr, batch_ssim = [], []
-    #             for c in range(sr.shape[0]):
-    #                 #predict_sr = (sr[c, ...].cpu().numpy().transpose((1, 2, 0)) + 1) * 127.5
-    #                 #ground_truth = (hr[c, ...].cpu().numpy().transpose((1, 2, 0)) + 1) * 127.5
-    #                 if not self.cfg['data']['normalize']:
-    #                     predict_sr = (sr[c, ...].cpu().numpy().transpose((1, 2, 0))) * 255
-    #                     ground_truth = (hr[c, ...].cpu().numpy().transpose((1, 2, 0))) * 255
-    #                 else:          
-    #                     predict_sr = (sr[c, ...].cpu().numpy().transpose((1, 2, 0)) + 1) * 127.5
-    #                     ground_truth = (hr[c, ...].cpu().numpy().transpose((1, 2, 0)) + 1) * 127.5
-    #                 psnr = calculate_psnr(predict_sr, ground_truth, 255)
-    #                 ssim = calculate_ssim(predict_sr, ground_truth, 255)
-    #                 batch_psnr.append(psnr)
-    #                 batch_ssim.append(ssim)
-    #             avg_psnr = np.array(batch_psnr).mean()
-    #             avg_ssim = np.array(batch_ssim).mean()
-    #             psnr_list.extend(batch_psnr)
-    #             ssim_list.extend(batch_ssim)
-    #             t1.set_postfix_str('Batch loss: {:.4f}, PSNR: {:.4f}, SSIM: {:.4f}'.format(loss.item(), avg_psnr, avg_ssim))
-    #             t1.update()
-    #         self.records['Epoch'].append(self.epoch)
-    #         self.records['PSNR'].append(np.array(psnr_list).mean())
-    #         self.records['SSIM'].append(np.array(ssim_list).mean())
+                self.model.eval()
+                with torch.no_grad():
+                    y = self.model(lms_image, bms_image, pan_image)
+                    loss = self.loss(y, ms_image)
 
-    #         save_config(self.log_name, 'Val Epoch {}: PSNR={:.4f}, SSIM={:.4f}'.format(self.epoch, self.records['PSNR'][-1],
-    #                                                                 self.records['SSIM'][-1]))
-    #         self.writer.add_scalar('PSNR_epoch', self.records['PSNR'][-1], self.epoch)
-    #         self.writer.add_scalar('SSIM_epoch', self.records['SSIM'][-1], self.epoch)
+                batch_psnr, batch_ssim = [], []
+                y = y[:,0:3,:,:]
+                ms_image=ms_image[:,0:3,:,:]
+                for c in range(y.shape[0]):
+                    if not self.cfg['data']['normalize']:
+                        predict_y = (y[c, ...].cpu().numpy().transpose((1, 2, 0))) * 255
+                        ground_truth = (ms_image[c, ...].cpu().numpy().transpose((1, 2, 0))) * 255
+                    else:          
+                        predict_y = (y[c, ...].cpu().numpy().transpose((1, 2, 0)) + 1) * 127.5
+                        ground_truth = (ms_image[c, ...].cpu().numpy().transpose((1, 2, 0)) + 1) * 127.5
+                    psnr = calculate_psnr(predict_y, ground_truth, 255)
+                    ssim = calculate_ssim(predict_y, ground_truth, 255)
+                    batch_psnr.append(psnr)
+                    batch_ssim.append(ssim)
+                avg_psnr = np.array(batch_psnr).mean()
+                avg_ssim = np.array(batch_ssim).mean()
+                psnr_list.extend(batch_psnr)
+                ssim_list.extend(batch_ssim)
+                t1.set_postfix_str('Batch loss: {:.4f}, PSNR: {:.4f}, SSIM: {:.4f}'.format(loss.item(), avg_psnr, avg_ssim))
+                t1.update()
+            self.records['Epoch'].append(self.epoch)
+            self.records['PSNR'].append(np.array(psnr_list).mean())
+            self.records['SSIM'].append(np.array(ssim_list).mean())
+
+            save_config(self.log_name, 'Val Epoch {}: PSNR={:.4f}, SSIM={:.4f}'.format(self.epoch, self.records['PSNR'][-1],
+                                                                    self.records['SSIM'][-1]))
+            self.writer.add_scalar('PSNR_epoch', self.records['PSNR'][-1], self.epoch)
+            self.writer.add_scalar('SSIM_epoch', self.records['SSIM'][-1], self.epoch)
             # self.writer.add_image('image_SR', sr[0], self.epoch)
             # self.writer.add_image('image_LR', lr[0], self.epoch)
             # self.writer.add_image('image_HR', hr[0], self.epoch)
@@ -179,7 +182,7 @@ class Solver(BaseSolver):
         try:
             while self.epoch <= self.nEpochs:
                 self.train()
-                # self.eval()
+                self.eval()
                 self.save_checkpoint()
                 self.epoch += 1
         except KeyboardInterrupt:

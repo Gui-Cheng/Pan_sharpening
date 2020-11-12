@@ -3,7 +3,7 @@
 '''
 @Author: wjm
 @Date: 2020-02-16 19:22:41
-LastEditTime: 2020-11-11 17:31:41
+LastEditTime: 2020-11-11 17:00:39
 @Description: file content
 '''
 from os.path import join
@@ -32,3 +32,5 @@ def get_test_data(cfg, mode):
 
 def get_eval_data(cfg, data_dir, upscale_factor):
     raise NotImplementedError
+    # data_dir = join(cfg['test']['data_dir'], data_dir)
+    # return Data_eval(data_dir, upscale_factor, cfg, transform=transform())

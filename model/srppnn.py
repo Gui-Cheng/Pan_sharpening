@@ -2,10 +2,10 @@
 # coding=utf-8
 '''
 Author: wjm
-Date: 2020-11-05 20:48:27
-LastEditTime: 2020-11-11 20:01:49
-Description: PNN (SRCMM-based), Pansharpening by Convolutional Neural Networks, 1e6, batch_size = 128
-, learning_rate = 1e-4, patch_size = 33
+Date: 2020-11-11 20:37:09
+LastEditTime: 2020-11-11 21:28:05
+Description: Super-Resolution-Guided Progressive Pansharpening Based on a Deep Convolutional Neural Network
+patch_size = 64, batch_size = 64, 
 '''
 import os
 import torch
@@ -19,9 +19,9 @@ class Net(nn.Module):
     def __init__(self, num_channels, base_filter, args):
         super(Net, self).__init__()
 
-        base_filter = 64
-        num_channels = 7
         out_channels = 4
+        self.res_block_x2 = ResnetBlock(4, 32, 3, 1, 1, bias=True, scale=1, activation='relu', norm=None, pad_model=None)
+        
         self.head = ConvBlock(num_channels, 48, 9, 1, 4, activation='relu', norm=None, bias = True)
 
         self.body = ConvBlock(48, 32, 5, 1, 2, activation='relu', norm=None, bias = True)
@@ -51,5 +51,6 @@ class Net(nn.Module):
         x_f = self.head(x_f)
         x_f = self.body(x_f)
         x_f = self.output_conv(x_f)
-
+        x_f = x_f + b_ms
+        
         return x_f

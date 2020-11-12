@@ -3,9 +3,9 @@
 '''
 Author: wjm
 Date: 2020-11-05 20:47:04
-LastEditTime: 2020-11-11 20:40:00
+LastEditTime: 2020-11-12 10:34:50
 Description: PanNet: A deep network architecture for pan-sharpening (VDSR-based)
-1e6, batch_size = 128, learning_rate = 1e-4, patch_size = 33
+1e6, batch_size = 128, learning_rate = 1e-4, patch_size = 33, l1 loss, learning_rate = 1e-4
 '''
 import os
 import torch

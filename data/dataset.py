@@ -3,7 +3,7 @@
 '''
 @Author: wjm
 @Date: 2019-10-23 14:57:22
-LastEditTime: 2020-11-11 17:00:30
+LastEditTime: 2020-11-12 11:00:53
 @Description: file content
 '''
 import torch.utils.data as data
@@ -47,7 +47,7 @@ def get_patch(ms_image, lms_image, pan_image, bms_image, patch_size, scale, ix=-
 
     lms_image = lms_image.crop((iy,ix,iy + ip, ix + ip))
     ms_image = ms_image.crop((ty,tx,ty + tp, tx + tp))
-    lms_image = lms_image.crop((ty,tx,ty + tp, tx + tp))
+    pan_image = pan_image.crop((ty,tx,ty + tp, tx + tp))
     bms_image = bms_image.crop((ty,tx,ty + tp, tx + tp))
                 
     info_patch = {
@@ -122,7 +122,7 @@ class Data(data.Dataset):
             pan_image = pan_image * 2 - 1
             bms_image = bms_image * 2 - 1
             
-        return ms_image, lms_image, pan_image, bms_image
+        return ms_image, lms_image, pan_image, bms_image, file
 
     def __len__(self):
         return len(self.ms_image_filenames)
@@ -166,7 +166,7 @@ class Data_test(data.Dataset):
             pan_image = pan_image * 2 - 1
             bms_image = bms_image * 2 - 1
             
-        return ms_image, lms_image, pan_image, bms_image
+        return ms_image, lms_image, pan_image, bms_image, file
 
     def __len__(self):
         return len(self.ms_image_filenames)

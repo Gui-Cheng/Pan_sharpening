@@ -15,8 +15,8 @@ threads: 8
 
 seed: 123
 checkpoint: checkpoint
-data_dir_train: ./dataset
-data_dir_eval: ./dataset
+data_dir_train: ./dataset/train
+data_dir_eval: ./dataset/test
 source_ms: ms
 source_pan: pan
 
@@ -36,8 +36,8 @@ data:
   normalize : False
   
 schedule:
-  lr: 1e-1
-  decay: 200
+  lr: 1e-4
+  decay: 500
   gamma: 0.1
   optimizer: SGD #[ADAM, SGD, RMSprop]
   momentum: 0.9 #SGD momentum

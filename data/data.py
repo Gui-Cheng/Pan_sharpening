@@ -3,7 +3,7 @@
 '''
 @Author: wjm
 @Date: 2020-02-16 19:22:41
-LastEditTime: 2020-11-11 17:00:39
+LastEditTime: 2020-11-12 17:04:17
 @Description: file content
 '''
 from os.path import join
@@ -25,8 +25,8 @@ def get_data(cfg, mode):
     return Data(data_dir_ms, data_dir_pan, cfg, transform=transform())
     
 def get_test_data(cfg, mode):
-    data_dir_ms = join(mode, cfg['source_ms'])
-    data_dir_pan = join(mode, cfg['source_pan'])
+    data_dir_ms = join(mode, cfg['test']['source_ms'])
+    data_dir_pan = join(mode, cfg['test']['source_pan'])
     cfg = cfg
     return Data_test(data_dir_ms, data_dir_pan, cfg, transform=transform())
 

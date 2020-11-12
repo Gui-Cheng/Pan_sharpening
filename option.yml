@@ -6,7 +6,7 @@
 # 
 
 name: Net
-algorithm: PNN #[PANNet, PNN]
+algorithm: PANNet #[PANNet, PNN]
 nEpochs: 1000
 gpu_mode: False
 save_best: False
@@ -25,11 +25,18 @@ pretrain:
   pre_sr: 1592134968/best.pth
   pre_folder: checkpoint
 
+test:
+  algorithm: PANNet #[PANNet, PNN]
+  type: test #[test, eval]
+  data_dir: ./dataset/test
+  source_ms: ms
+  source_pan: pan
+  model: PANNet_4_1605171526/latest.pth
+
 data:
-  lrms_num: 4
   upsacle:  4
   batch_size: 16
-  patch_size: 64
+  patch_size: 33
   data_augmentation: False                                                                                                                                                                                               
   n_colors: 4
   rgb_range: 255

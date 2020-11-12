@@ -3,7 +3,7 @@
 '''
 @Author: wjm
 @Date: 2019-10-23 14:57:22
-LastEditTime: 2020-11-12 11:00:53
+LastEditTime: 2020-11-12 19:25:15
 @Description: file content
 '''
 import torch.utils.data as data
@@ -19,8 +19,8 @@ def is_image_file(filename):
     return any(filename.endswith(extension) for extension in ['.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP', 'tif', 'TIF'])
 
 
-def load_img(filepath, space):
-    img = Image.open(filepath).convert(space)
+def load_img(filepath):
+    img = Image.open(filepath)
     #img = Image.open(filepath)
     return img
 
@@ -97,8 +97,8 @@ class Data(data.Dataset):
 
     def __getitem__(self, index):
         
-        ms_image = load_img(self.ms_image_filenames[index], 'CMYK')
-        pan_image = load_img(self.pan_image_filenames[index], 'L')
+        ms_image = load_img(self.ms_image_filenames[index])
+        pan_image = load_img(self.pan_image_filenames[index])
         _, file = os.path.split(self.ms_image_filenames[index])
         ms_image = ms_image.crop((0, 0, ms_image.size[0] // self.upscale_factor * self.upscale_factor, ms_image.size[1] // self.upscale_factor * self.upscale_factor))
         lms_image = ms_image.resize((int(ms_image.size[0]/self.upscale_factor),int(ms_image.size[1]/self.upscale_factor)), Image.BICUBIC)       
@@ -129,7 +129,7 @@ class Data(data.Dataset):
 
 class Data_test(data.Dataset):
     def __init__(self, data_dir_ms, data_dir_pan, cfg, transform=None):
-        super(Data, self).__init__()
+        super(Data_test, self).__init__()
     
         self.ms_image_filenames = [join(data_dir_ms, x) for x in listdir(data_dir_ms) if is_image_file(x)]
         self.pan_image_filenames = [join(data_dir_pan, x) for x in listdir(data_dir_pan) if is_image_file(x)]
@@ -143,8 +143,8 @@ class Data_test(data.Dataset):
 
     def __getitem__(self, index):
         
-        ms_image = load_img(self.ms_image_filenames[index], 'CMYK')
-        pan_image = load_img(self.pan_image_filenames[index], 'L')
+        ms_image = load_img(self.ms_image_filenames[index])
+        pan_image = load_img(self.pan_image_filenames[index])
         _, file = os.path.split(self.ms_image_filenames[index])
         ms_image = ms_image.crop((0, 0, ms_image.size[0] // self.upscale_factor * self.upscale_factor, ms_image.size[1] // self.upscale_factor * self.upscale_factor))
         lms_image = ms_image.resize((int(ms_image.size[0]/self.upscale_factor),int(ms_image.size[1]/self.upscale_factor)), Image.BICUBIC)       

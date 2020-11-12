@@ -3,7 +3,7 @@
 '''
 @Author: wjm
 @Date: 2019-10-13 23:04:48
-LastEditTime: 2020-11-12 15:18:01
+LastEditTime: 2020-11-12 15:29:11
 @Description: file content
 '''
 import os, importlib, torch, shutil
@@ -54,8 +54,7 @@ class Solver(BaseSolver):
             epoch_loss = 0
             for iteration, batch in enumerate(self.train_loader, 1):
                 ms_image, lms_image, pan_image, bms_image, file = Variable(batch[0]), Variable(batch[1]), Variable(batch[2]), Variable(batch[3]), (batch[4])
-            #for data in self.train_loader:
-                #lr, hr = data[0], data[1]
+
                 if self.cuda:
                     ms_image, lms_image, pan_image, bms_image = ms_image.cuda(self.gpu_ids[0]), lms_image.cuda(self.gpu_ids[0]), pan_image.cuda(self.gpu_ids[0]), bms_image.cuda(self.gpu_ids[0])
 
@@ -87,9 +86,8 @@ class Solver(BaseSolver):
                 desc='Val Epoch: [{}/{}]'.format(self.epoch, self.nEpochs)) as t1:
             psnr_list, ssim_list = [], []
             for iteration, batch in enumerate(self.val_loader, 1):
+                
                 ms_image, lms_image, pan_image, bms_image, file = Variable(batch[0]), Variable(batch[1]), Variable(batch[2]), Variable(batch[3]), (batch[4])
-            #for data in self.train_loader:
-                #lr, hr = data[0], data[1]
                 if self.cuda:
                     ms_image, lms_image, pan_image, bms_image = ms_image.cuda(self.gpu_ids[0]), lms_image.cuda(self.gpu_ids[0]), pan_image.cuda(self.gpu_ids[0]), bms_image.cuda(self.gpu_ids[0])
 
@@ -126,9 +124,6 @@ class Solver(BaseSolver):
                                                                     self.records['SSIM'][-1]))
             self.writer.add_scalar('PSNR_epoch', self.records['PSNR'][-1], self.epoch)
             self.writer.add_scalar('SSIM_epoch', self.records['SSIM'][-1], self.epoch)
-            # self.writer.add_image('image_SR', sr[0], self.epoch)
-            # self.writer.add_image('image_LR', lr[0], self.epoch)
-            # self.writer.add_image('image_HR', hr[0], self.epoch)
 
     def check_gpu(self):
         self.cuda = self.cfg['gpu_mode']
@@ -171,7 +166,7 @@ class Solver(BaseSolver):
         torch.save(self.ckp, os.path.join(self.cfg['checkpoint'] + '/' + str(self.log_name), 'latest.pth'))
 
         if self.cfg['save_best']:
-            if self.records['Loss'] != [] and self.records['Loss'][-1] == np.array(self.records['Loss']).max():
+            if self.records['SSIM'] != [] and self.records['SSIM'][-1] == np.array(self.records['SSIM']).max():
                 shutil.copy(os.path.join(self.cfg['checkpoint'] + '/' + str(self.log_name), 'latest.pth'),
                             os.path.join(self.cfg['checkpoint'] + '/' + str(self.log_name), 'best.pth'))
 

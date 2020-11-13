@@ -3,7 +3,7 @@
 '''
 Author: wjm
 Date: 2020-11-05 20:47:04
-LastEditTime: 2020-11-12 10:34:50
+LastEditTime: 2020-11-13 09:49:05
 Description: PanNet: A deep network architecture for pan-sharpening (VDSR-based)
 1e6, batch_size = 128, learning_rate = 1e-4, patch_size = 33, l1 loss, learning_rate = 1e-4
 '''
@@ -31,13 +31,13 @@ class Net(nn.Module):
         for m in self.modules():
             classname = m.__class__.__name__
             if classname.find('Conv2d') != -1:
-        	    # torch.nn.init.kaiming_normal_(m.weight)
-        	    torch.nn.init.xavier_uniform_(m.weight, gain=1)
+        	    torch.nn.init.kaiming_normal_(m.weight)
+        	    # torch.nn.init.xavier_uniform_(m.weight, gain=1)
         	    if m.bias is not None:
         		    m.bias.data.zero_()
             elif classname.find('ConvTranspose2d') != -1:
-        	    # torch.nn.init.kaiming_normal_(m.weight)
-        	    torch.nn.init.xavier_uniform_(m.weight, gain=1)
+        	    torch.nn.init.kaiming_normal_(m.weight)
+        	    # torch.nn.init.xavier_uniform_(m.weight, gain=1)
         	    if m.bias is not None:
         		    m.bias.data.zero_()
 

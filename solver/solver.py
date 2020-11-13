@@ -3,7 +3,7 @@
 '''
 @Author: wjm
 @Date: 2019-10-13 23:04:48
-LastEditTime: 2020-11-12 15:29:11
+LastEditTime: 2020-11-13 18:46:39
 @Description: file content
 '''
 import os, importlib, torch, shutil
@@ -62,7 +62,7 @@ class Solver(BaseSolver):
                 self.model.train()
 
                 y = self.model(lms_image, bms_image, pan_image)
-                loss = self.loss(y, ms_image)
+                loss = self.loss(y, ms_image) / self.cfg['data']['batch_size']
 
                 epoch_loss += loss.data
                 t.set_postfix_str("Batch loss {:.4f}".format(loss.item()))
@@ -78,6 +78,9 @@ class Solver(BaseSolver):
                 self.optimizer.step()
                 
             self.records['Loss'].append(epoch_loss / len(self.train_loader))
+            self.writer.add_image('image1', ms_image[0], self.epoch)
+            self.writer.add_image('image2', y[0], self.epoch)
+            self.writer.add_image('image3', pan_image[0], self.epoch)
             save_config(self.log_name, 'Initial Training Epoch {}: Loss={:.4f}'.format(self.epoch, self.records['Loss'][-1]))
             self.writer.add_scalar('Loss_epoch', self.records['Loss'][-1], self.epoch)
 

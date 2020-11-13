@@ -3,7 +3,7 @@
 '''
 Author: wjm
 Date: 2020-11-05 20:47:04
-LastEditTime: 2020-11-13 09:49:05
+LastEditTime: 2020-11-12 10:34:50
 Description: PanNet: A deep network architecture for pan-sharpening (VDSR-based)
 1e6, batch_size = 128, learning_rate = 1e-4, patch_size = 33, l1 loss, learning_rate = 1e-4
 '''
@@ -22,22 +22,22 @@ class Net(nn.Module):
         base_filter = 64
         num_channels = 7
         out_channels = 4
-        self.head = ConvBlock(num_channels, 48, 9, 1, 4, activation='relu', norm=None, bias = True)
+        self.head = ConvBlock(num_channels, 48, 9, 1, 4, activation='relu', norm=None, bias = False)
 
-        self.body = ConvBlock(48, 32, 5, 1, 2, activation='relu', norm=None, bias = True)
+        self.body = ConvBlock(48, 32, 5, 1, 2, activation=None, norm=None, bias = False)
 
-        self.output_conv = ConvBlock(32, out_channels, 5, 1, 2, activation='relu', norm=None, bias = True)
+        self.output_conv = ConvBlock(32, out_channels, 5, 1, 2, activation=None, norm=None, bias = False)
 
         for m in self.modules():
             classname = m.__class__.__name__
             if classname.find('Conv2d') != -1:
-        	    torch.nn.init.kaiming_normal_(m.weight)
-        	    # torch.nn.init.xavier_uniform_(m.weight, gain=1)
+        	    #torch.nn.init.kaiming_normal_(m.weight)
+        	    torch.nn.init.xavier_uniform_(m.weight, gain=1)
         	    if m.bias is not None:
         		    m.bias.data.zero_()
             elif classname.find('ConvTranspose2d') != -1:
-        	    torch.nn.init.kaiming_normal_(m.weight)
-        	    # torch.nn.init.xavier_uniform_(m.weight, gain=1)
+        	    #torch.nn.init.kaiming_normal_(m.weight)
+        	    torch.nn.init.xavier_uniform_(m.weight, gain=1)
         	    if m.bias is not None:
         		    m.bias.data.zero_()
 
@@ -51,7 +51,8 @@ class Net(nn.Module):
         x_f = self.head(x_f)
         x_f = self.body(x_f)
         x_f = self.output_conv(x_f)
-        x_f = x_f + b_ms
+        x_f = torch.add(x_f,b_ms)
+
         
         return x_f
         

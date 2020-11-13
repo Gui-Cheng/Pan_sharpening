@@ -6,10 +6,10 @@
 # 
 
 name: Net
-algorithm: PANNet #[PANNet, PNN]
-nEpochs: 1000
-gpu_mode: False
-save_best: False
+algorithm: PNN #[PANNet, PNN]
+nEpochs: 2000
+gpu_mode: True
+save_best: True
 gpus: [0, 1]
 threads: 8
 
@@ -31,7 +31,7 @@ test:
   data_dir: ./dataset/test
   source_ms: ms
   source_pan: pan
-  model: PANNet_4_1605171526/latest.pth
+  model: PANNet_4_1605255794/best.pth
 
 data:
   upsacle:  4
@@ -43,7 +43,7 @@ data:
   normalize : False
   
 schedule:
-  lr: 1e-4
+  lr: 1e-2
   decay: 500
   gamma: 0.1
   optimizer: SGD #[ADAM, SGD, RMSprop]
@@ -53,7 +53,7 @@ schedule:
   epsilon: 1e-8 #ADAM epsilon
   alpha: 0.9 #RMSprop alpha
   weight_dency: 0
-  gclip: 0.4
+  gclip: 0.04
   loss: MSE #[MSE, L1]
   use_YCbCr: False
 

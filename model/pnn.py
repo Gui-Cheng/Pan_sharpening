@@ -3,9 +3,9 @@
 '''
 Author: wjm
 Date: 2020-11-05 20:48:27
-LastEditTime: 2020-11-11 20:01:49
-Description: PNN (SRCMM-based), Pansharpening by Convolutional Neural Networks, 1e6, batch_size = 128
-, learning_rate = 1e-4, patch_size = 33
+LastEditTime: 2020-11-13 22:29:03
+Description: PNN (SRCMM-based), Pansharpening by Convolutional Neural Networks, 2000 epoch, decay 1000,
+batch_size = 16, learning_rate = 1e-2, patch_size = 33, MSE
 '''
 import os
 import torch

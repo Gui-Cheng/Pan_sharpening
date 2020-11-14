@@ -3,7 +3,7 @@
 '''
 @Author: wjm
 @Date: 2019-10-13 23:04:48
-LastEditTime: 2020-11-13 18:46:39
+LastEditTime: 2020-11-14 12:04:14
 @Description: file content
 '''
 import os, importlib, torch, shutil
@@ -62,7 +62,7 @@ class Solver(BaseSolver):
                 self.model.train()
 
                 y = self.model(lms_image, bms_image, pan_image)
-                loss = self.loss(y, ms_image) / self.cfg['data']['batch_size']
+                loss = self.loss(y, ms_image) / (self.cfg['data']['batch_size'] * 2)
 
                 epoch_loss += loss.data
                 t.set_postfix_str("Batch loss {:.4f}".format(loss.item()))
